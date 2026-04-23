@@ -48,23 +48,12 @@ separate functions/if statements inside the bot functions FOR THE PLAYER
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef enum { // 0    1    2   3   4   5   6   7-strongest
-    SEVEN,
-    EIGHT,
-    NINE,
-    TEN,
-    JACK,
-    QUEEN,
-    KING,
-    ACE
-} rank;
 
-typedef enum { // 0    1    2   3-strongest
-    SPADES,
-    DIAMONDS,
-    HEARTS,
-    CLUBS
-} suit;
+const char ranks[8] = {  '7',   '8',  '9',  't',  'J',  'Q',  'K',  'A' };
+typedef enum          { SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE } rank;
+
+const char* suits[4] = {  "♠",     "♦",     "♥",    "♣"  };
+typedef enum           { SPADES, DIAMONDS, HEARTS, CLUBS } suit;
 
 typedef struct { // card = 2 ints in struct
     suit suit;
@@ -75,7 +64,48 @@ typedef struct { // hand = array of cards
     card cards[8];
 } hand;
 
-//DISTRIBUTING
+
+typedef enum { // 0 to 6 ; 0 is the weakest
+    BID_PASS,
+    BID_DIAMONDS,
+    BID_HEARTS,
+    BID_CLUBS,
+    BID_NO_TRUMP,
+    BID_ALL_TRUMP
+} bid;
+
+typedef struct {
+    bid currentBid;
+    bid lastBid;
+    uint8_t lastBidder;
+    uint8_t currentBidder;
+    uint8_t passesInRow;
+    //...
+} biddingGamestate;
+
+
+typedef struct {
+    bid playingBid;
+    uint8_t lastTrickWinner;
+    //...
+} playingGamestate;
+
+
+//                             7  8  9   10  J   Q  K   A
+uint8_t pointsNotATrump[8] = { 0, 0, 0,  10, 2,  3, 4, 11 };
+uint8_t pointsIsATrump[8]  = { 0, 0, 14, 10, 20, 3, 4, 11 };
+
+hand playerWonHands[8], bot1WonHands[8], bot2WonHands_[8], bot3WonHands[8];
+uint16_t points_player_bot2_Team, points_bot1_bot2_Team; // points for both teams
+
+
+
+//----------------------FUNCTIONS----------------------------------------------------------------------------
+void print_card(const card myCard) {
+    printf("%c ", ranks[myCard.rank]);
+    printf("%s\n", suits[myCard.suit]);
+}
+
 void init_deck(card deck[32]) {
     uint8_t initDeckIndex = 0;
     for (suit suit = SPADES; suit <= CLUBS; suit++) {  // suit from 0 to 4
@@ -85,7 +115,7 @@ void init_deck(card deck[32]) {
     }
 }
 
-void shuffle_cards(card deck[32]) {   // Fisher-Yates shuffle - all possible shuffles = equally likely
+void shuffle_deck(card deck[32]) {   // Fisher-Yates shuffle - all possible shuffles = equally likely
     for (uint8_t index = 0; index < 32; index++) { // 31 = max index in arr of 32
         uint8_t randomIndex = rand() % (index+1); // random index = from 0 to index
 
@@ -105,42 +135,16 @@ void distribute_cards(card deck[32], hand hands[4]) {
 }
 
 
-//BIDDING
-typedef enum { // 0 to 6 ; 0 is the weakest
-    BID_PASS,
-    BID_DIAMONDS,
-    BID_HEARTS,
-    BID_CLUBS,
-    BID_NO_TRUMP,
-    BID_ALL_TRUMP
-} bid;
-
-typedef struct {
-    bid currentBid;
-    bid lastBid;
-    uint8_t lastBidder;
-    uint8_t currentBidder;
-    uint8_t passesInRow;
-} biddingGamestate;
-
-void declare_bid_player() {
+void declare_bid_player() { //test
     char test[20];
     scanf("%s", test);
     printf("%s\n", test);
 }
+
 void declare_bid_bot(const hand botHand) {
 
 }
 
-
-//PLAYING
-typedef struct {
-    bid playingBid;
-    uint8_t lastTrickWinner;
-
-    //...
-
-} playingGamestate;
 
 void make_a_move_bot(hand botHand) {
 
@@ -150,13 +154,6 @@ void make_a_move_player(hand playerHand) {
 }
 
 
-//SCORING                      7  8  9   10  J   Q  K   A
-uint8_t pointsNotATrump[8] = { 0, 0, 0,  10, 2,  3, 4, 11 };
-uint8_t pointsIsATrump[8]  = { 0, 0, 14, 10, 20, 3, 4, 11 };
-
-hand winnedHands_player[8], winnedHands_bot1[8], winnedHands_bot2[8], winnedHands_bot3[8];
-uint16_t points_player_bot2_Team, points_bot1_bot2_Team; // points for both teams
-
 void count_points_from_a_taken_hand(bid playingBid, hand takenHand) { //will be ran with a for loop for all taken hands, for all players
 
 
@@ -164,20 +161,26 @@ void count_points_from_a_taken_hand(bid playingBid, hand takenHand) { //will be 
 
 
 
-
 int main() {
+    system("chcp 65001");
+
     //DISTRIBUTING
     card deck[32];
     hand allHands[4];
 
     init_deck(deck);
-    printf("%d\n", deck);
+    for (uint8_t i=0; i <= 31; i++) {
+        print_card(deck[i]);
+    }
 
-    shuffle_cards(deck);
-    printf("%d\n", deck);
+    puts("\n");
+
+    shuffle_deck(deck);
+    for (uint8_t i=0; i <= 31; i++) {
+        print_card(deck[i]);
+    }
 
 
-    declare_bid_player();
 
 
     //BIDDING
