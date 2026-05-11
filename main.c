@@ -49,6 +49,8 @@ separate functions/if statements inside the bot functions FOR THE PLAYER
 #include <stdlib.h>
 
 
+
+
 const char ranks[8] = {  '7',   '8',  '9',  't',  'J',  'Q',  'K',  'A' };
 typedef enum          { SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE } rank;
 
@@ -63,6 +65,8 @@ typedef struct { // card = 2 ints in struct
 typedef struct { // hand = array of cards
     card cards[8];
 } hand;
+
+
 
 
 typedef enum { // 0 to 6 ; 0 is the weakest
@@ -84,11 +88,15 @@ typedef struct {
 } biddingGamestate;
 
 
+
+
 typedef struct {
     bid playingBid;
     uint8_t lastTrickWinner;
     //...
 } playingGamestate;
+
+
 
 
 //                             7  8  9   10  J   Q  K   A
@@ -100,11 +108,14 @@ uint16_t points_player_bot2_Team, points_bot1_bot2_Team; // points for both team
 
 
 
-//----------------------FUNCTIONS----------------------------------------------------------------------------
+
+
+
 void print_card(const card myCard) {
     printf("%c ", ranks[myCard.rank]);
     printf("%s\n", suits[myCard.suit]);
 }
+
 
 void init_deck(card deck[32]) {
     uint8_t initDeckIndex = 0;
@@ -126,11 +137,21 @@ void shuffle_deck(card deck[32]) {   // Fisher-Yates shuffle - all possible shuf
 }
 
 void distribute_cards(card deck[32], hand hands[4]) {
-    for (uint8_t i; i <= 3; i++) { // 4* ( 3* give card from arr to player i)
 
+    uint8_t deckIndex = 0; // loop thru deck
+
+    // 4* ( 3* give card from arr to player i)
+    for (uint8_t cardNum=0; cardNum<3; cardNum++) { // index 0..1..2 -> 3 cards
+        for (uint8_t player=0; player<4; player++) {
+            hands[player].cards[cardNum] = deck[deckIndex++]; // deckIndex - store last card given
+        }
     }
-    for (uint8_t i; i <= 2; i++) { // 4* (player i (2* give card from arr))
 
+    // 4* ( 2* give card from arr to player i)
+    for (uint8_t cardNum=3; cardNum<5; cardNum++) { // index 3..4 -> 2 more cards
+        for (uint8_t player=0; player<4; player++) {
+            hands[player].cards[cardNum] = deck[deckIndex++];
+        }
     }
 }
 
