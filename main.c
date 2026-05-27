@@ -54,7 +54,7 @@ separate functions/if statements inside the bot functions FOR THE PLAYER
 const char ranks[8] = {  '7',   '8',  '9',  't',  'J',  'Q',  'K',  'A' };
 typedef enum          { SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE } rank;
 
-const char* suits[4] = {  "♠",     "♦",     "♥",    "♣"  };
+const char* suits[4] = {  "♠",     "♦",     "♥",    "♣"  }; // char* cz of the symbols being 2 cahrs long
 typedef enum           { SPADES, DIAMONDS, HEARTS, CLUBS } suit;
 
 typedef struct { // card = 2 ints in struct
@@ -116,7 +116,6 @@ void print_card(const card myCard) {
     printf("%s\n", suits[myCard.suit]);
 }
 
-
 void init_deck(card deck[32]) {
     uint8_t initDeckIndex = 0;
     for (suit suit = SPADES; suit <= CLUBS; suit++) {  // suit from 0 to 4
@@ -140,14 +139,14 @@ void distribute_cards(card deck[32], hand hands[4]) {
 
     uint8_t deckIndex = 0; // loop thru deck
 
-    // 4* ( 3* give card from arr to player i)
+    //  3 * give card from arr to player i
     for (uint8_t cardNum=0; cardNum<3; cardNum++) { // index 0..1..2 -> 3 cards
         for (uint8_t player=0; player<4; player++) {
             hands[player].cards[cardNum] = deck[deckIndex++]; // deckIndex - store last card given
         }
     }
 
-    // 4* ( 2* give card from arr to player i)
+    // 2 * give card from arr to player i
     for (uint8_t cardNum=3; cardNum<5; cardNum++) { // index 3..4 -> 2 more cards
         for (uint8_t player=0; player<4; player++) {
             hands[player].cards[cardNum] = deck[deckIndex++];
@@ -156,10 +155,12 @@ void distribute_cards(card deck[32], hand hands[4]) {
 }
 
 
-void declare_bid_player() { //test
+
+
+void declare_bid_player(const hand playerHand) { //test
     char test[20];
-    scanf("%s", test);
-    printf("%s\n", test);
+    //scanf("%s", test);
+    //printf("%s\n", test);
 }
 
 void declare_bid_bot(const hand botHand) {
@@ -167,12 +168,17 @@ void declare_bid_bot(const hand botHand) {
 }
 
 
+
+
 void make_a_move_bot(hand botHand) {
 
 }
+
 void make_a_move_player(hand playerHand) {
 
 }
+
+
 
 
 void count_points_from_a_taken_hand(bid playingBid, hand takenHand) { //will be ran with a for loop for all taken hands, for all players
@@ -182,10 +188,13 @@ void count_points_from_a_taken_hand(bid playingBid, hand takenHand) { //will be 
 
 
 
+
+
+
 int main() {
     system("chcp 65001");
 
-    //DISTRIBUTING
+    //DISTRIBUTING--------------------------------------------------------------------
     card deck[32];
     hand allHands[4];
 
@@ -193,26 +202,41 @@ int main() {
     for (uint8_t i=0; i <= 31; i++) {
         print_card(deck[i]);
     }
-
     puts("\n");
 
     shuffle_deck(deck);
     for (uint8_t i=0; i <= 31; i++) {
         print_card(deck[i]);
     }
+    puts("\n");
 
+    distribute_cards(deck, allHands);
+    for (uint8_t i=0; i <= 3; i++) {
+        for (uint8_t j=0; j<=4; j++) {
+            print_card(allHands[i].cards[j]);
+        }
+        puts("\n");
+    }
 
-
-
-    //BIDDING
+    //BIDDING-------------------------------------------------------------------------
     biddingGamestate biddingGamestate;
 
-    //PLAYING
+
+    //PLAYING-------------------------------------------------------------------------
     playingGamestate playingGamestate;
 
 
 
-    //SCORING
+    //SCORING-------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
 
 
     return 0;
